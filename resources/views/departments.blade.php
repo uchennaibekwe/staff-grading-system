@@ -216,19 +216,19 @@
                         <div class="col-lg-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    Create Category
+                                    Create Department
                                 </div>
                                 <!-- /.panel-heading -->
-                                <form action="{{ route('categories.store') }}" method="post" class="form-inline">
+                                <form action="{{ route('departments.store') }}" method="post" class="form-inline">
                                     @csrf
                                     <div class="panel-body">
                                         <div class="col-lg-12">
                                             <div class="form-group">
-                                                <label>Category Name: </label>
-                                                <input name="name" class="form-control">
+                                                <label>Department Name: </label>
+                                                <input name="name" class="form-control" autofocus required>
                                             </div>
                                             
-                                            <button type="submit" class="btn btn-primary">Create Category</button>
+                                            <button type="submit" class="btn btn-primary">Create Department</button>
                                         </div>
                                     </div>
                                 </form>
@@ -251,18 +251,23 @@
                                         <table class="table table-striped table-bordered table-hover" id="dataTables-example">
                                             <thead>
                                                 <tr>
-                                                    <th>Category</th>
-                                                    <th>No of Users</th>
+                                                    <th>Department</th>
+                                                    <th>No. of Entries</th>
+                                                    <th>Created At</th>
+                                                    {{-- <th>No of Users</th> --}}
                                                     <!-- <th>Over all grade</th> -->
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr class="gradeA">
-                                                    <td>Health</td>
-                                                    <td class="center">1.5</td>
-                                                    <!-- <td class="center">A</td> -->
-                                                </tr>
-                                                <tr class="gradeA">
+                                                @foreach ($departments as $department)
+                                                    <tr class="gradeA">
+                                                        <td>{{ $department->name }}</td>
+                                                        <td>10</td>
+                                                        <td class="center">{{ date('F d, Y', strtotime($department->created_at)) }}</td>
+                                                        <!-- <td class="center">A</td> -->
+                                                    </tr>
+                                                @endforeach
+                                                {{-- <tr class="gradeA">
                                                     <td>Food</td>
                                                     <td class="center">1.6</td>
                                                     <!-- <td class="center">A</td> -->
@@ -271,7 +276,7 @@
                                                     <td>Transport</td>
                                                     <td class="center">1.7</td>
                                                     <!-- <td class="center">B</td> -->
-                                                </tr>
+                                                </tr> --}}
                                             </tbody>
                                         </table>
                                     </div>

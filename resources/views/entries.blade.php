@@ -10,22 +10,22 @@
         <title>Startmin - Bootstrap Admin Theme</title>
 
         <!-- Bootstrap Core CSS -->
-        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
 
         <!-- MetisMenu CSS -->
-        <link href="../css/metisMenu.min.css" rel="stylesheet">
+        <link href="{{ asset('css/metisMenu.min.css') }}" rel="stylesheet">
 
         <!-- DataTables CSS -->
-        <link href="../css/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+        <link href="{{ asset('css/dataTables/dataTables.bootstrap.css') }}" rel="stylesheet">
 
         <!-- DataTables Responsive CSS -->
-        <link href="../css/dataTables/dataTables.responsive.css" rel="stylesheet">
+        <link href="{{ asset('css/dataTables/dataTables.responsive.css') }}" rel="stylesheet">
 
         <!-- Custom CSS -->
-        <link href="../css/startmin.css" rel="stylesheet">
+        <link href="{{ asset('css/startmin.css') }}" rel="stylesheet">
 
         <!-- Custom Fonts -->
-        <link href="../css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
 
     </head>
     <body>
@@ -207,31 +207,31 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-lg-12">
-                            <h1 class="page-header">Result</h1>
+                            <h1 class="page-header">Entry Summary</h1>
                         </div>
                         <!-- /.col-lg-12 -->
                     </div>
+                    @include('notification')
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    Search Another Category
+                                <div class="panel-heading text-center">
+                                    Search Department
                                 </div>
                                 <!-- /.panel-heading -->
-                                <form action="" method="post" class="form-inline">
-                                    <div class="panel-body">
-                                        <div class="col-lg-12">
+                                <form action="{{ route('entries.index') }}" method="get" class="form-inline">
+                                    <div class="panel-body text-center">
+                                        <div class="center">
                                             <div class="form-group">
-                                                <label> Select Category: </label>
-                                                <select class="form-control">
-                                                    <option>Food</option>
-                                                    <option>Health</option>
-                                                    <option>Culture</option>
-                                                    <option>Entertainment</option>
-                                                    <option>Others</option>
+                                                {{-- <label> Select Department: </label> --}}
+                                                <select class="form-control col-md-6" name="department" required>
+                                                    <option value="">-- Select a Department --</option>
+                                                    @foreach ($departments as $department)
+                                                        <option value="{{ $department->name }}" @if(Request::get('department') == $department->name) selected @endif>{{ $department->name}}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
-                                            <button type="submit" class="btn btn-primary">Search Category</button>
+                                            <button type="submit" class="btn btn-primary">Search Department</button>
                                         </div>
                                     </div>
                                 </form>
@@ -241,6 +241,24 @@
                         </div>
                     </div>
                     <!-- /.row -->
+                    @if (null !== Request::get('department'))
+                    
+                    @php
+                        function computeGrade($average) {
+                            if ($average >= 80)
+                                return 'A';
+                            else if ($average >= 65)
+                                return 'B';
+                            else if ($average >= 55)
+                                return 'c';
+                            else if ($average >= 40)
+                                return 'D';
+                            else if ($average >= 30)
+                                return 'E';
+                            else 
+                                return 'F';
+                        }
+                    @endphp 
                     <div class="row">
                         <div class="col-lg-3 col-md-6">
                             <div class="panel panel-primary">
@@ -250,14 +268,14 @@
                                             <i class="fa fa-user fa-5x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
-                                            <div class="huge">26</div>
+                                            <div class="huge">{{ $entries->count()}}</div>
                                             <div>Total Users</div>
                                         </div>
                                     </div>
                                 </div>
                                 <a href="#">
                                     <div class="panel-footer">
-                                        <span class="pull-left">View Details</span>
+                                        {{-- <span class="pull-left">View Details</span> --}}
                                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
 
                                         <div class="clearfix"></div>
@@ -270,17 +288,17 @@
                                 <div class="panel-heading">
                                     <div class="row">
                                         <div class="col-xs-3">
-                                            <i class="fa fa-tasks fa-5x"></i>
+                                            <i class="fa fa-check-circle fa-5x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
-                                            <div class="huge">12</div>
+                                            <div class="huge">{{ $entries->sum('total')}}</div>
                                             <div>Grand Total</div>
                                         </div>
                                     </div>
                                 </div>
                                 <a href="#">
                                     <div class="panel-footer">
-                                        <span class="pull-left">View Details</span>
+                                        {{-- <span class="pull-left">View Details</span> --}}
                                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
 
                                         <div class="clearfix"></div>
@@ -293,17 +311,17 @@
                                 <div class="panel-heading">
                                     <div class="row">
                                         <div class="col-xs-3">
-                                            <i class="fa fa-shopping-cart fa-5x"></i>
+                                            <i class="fa fa-percent fa-5x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
-                                            <div class="huge">47%</div>
+                                            <div class="huge">{{ $average = $entries->sum('total') == 0  ? 0 : $entries->sum('total') / $entries->count() }}%</div>
                                             <div>Percentage</div>
                                         </div>
                                     </div>
                                 </div>
                                 <a href="#">
                                     <div class="panel-footer">
-                                        <span class="pull-left">View Details</span>
+                                        {{-- <span class="pull-left">View Details</span> --}}
                                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
 
                                         <div class="clearfix"></div>
@@ -316,17 +334,17 @@
                                 <div class="panel-heading">
                                     <div class="row">
                                         <div class="col-xs-3">
-                                            <i class="fa fa-support fa-5x"></i>
+                                            <i class="fa fa-graduation-cap fa-5x"></i>
                                         </div>
                                         <div class="col-xs-9 text-right">
-                                            <div class="huge">A</div>
+                                            <div class="huge">{{ computeGrade($average) }}</div>
                                             <div>Grade</div>
                                         </div>
                                     </div>
                                 </div>
                                 <a href="#">
                                     <div class="panel-footer">
-                                        <span class="pull-left">View Details</span>
+                                        {{-- <span class="pull-left">View Details</span> --}}
                                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
 
                                         <div class="clearfix"></div>
@@ -340,26 +358,41 @@
                         <div class="col-lg-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    Overview of [Chosen] Category
+                                    Overview of <b>{{ Request::get('department') }}</b> Department
                                 </div>
 
                                 <!-- /.panel-heading -->
                                 <div class="panel-body">
                                     <div class="table-responsive">
+                                        @php $fields = ['punctuality', 'professionalism', 'innovation', 'respect', 'communication', 'management', 'leadership', 'delivery', 'inclusiveness', 'appearance',]@endphp
                                         <table class="table table-striped table-bordered table-hover" id="dataTables-example">
                                             <thead>
                                                 <tr>
                                                     <th>User</th>
-                                                    <th>Score 1</th>
-                                                    <th>Score 2</th>
-                                                    <th>Score 3</th>
+                                                    @foreach ($fields as $field)
+                                                        <th>{{ ucfirst($field) }}</th>
+                                                    @endforeach
                                                     <th>Total</th>
                                                     <th>Average</th>
                                                     <th>Grade</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr class="gradeA">
+                                                @foreach ($entries as $entry)
+                                                    <tr class="gradeA">
+                                                        <td>{{ $entry->user->name }}</td>
+                                                        @foreach ($fields as $field)
+                                                            <td class="center">{{ $entry->$field }}</td>
+                                                        @endforeach
+                                                        {{-- <td class="center">{{ $entry->punctuality }}</td>
+                                                        <td class="center">1.5</td>
+                                                        <td class="center">4.5</td> --}}
+                                                        <td class="center">{{ $entry->total}}</td>
+                                                        <td class="center">{{ $entry->average}}</td>
+                                                        <td class="center">{{ $entry->grade }}</td>
+                                                    </tr>
+                                                @endforeach
+                                                {{-- <tr class="gradeA">
                                                     <td>Obinna</td>
                                                     <td class="center">1.5</td>
                                                     <td class="center">1.5</td>
@@ -385,7 +418,7 @@
                                                     <td class="center">4.5</td>
                                                     <td class="center">12%</td>
                                                     <td class="center">A</td>
-                                                </tr>
+                                                </tr> --}}
                                             </tbody>
                                         </table>
                                     </div>
@@ -396,6 +429,7 @@
                         </div>
                         <!-- /.col-lg-12 -->
                     </div>
+                    @endif
                     <!-- /.row -->
                 </div>
                 <!-- /.container-fluid -->

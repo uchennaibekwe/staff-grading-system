@@ -160,9 +160,11 @@
                         </div>
                         <!-- /.col-lg-12 -->
                     </div>
+                    @include("notification")
                     <!-- /.row -->
                     <div class="row">
-                        <form role="form">
+                        <form role="form" action="{{ route('entries.store') }}" method="POST">
+                            @csrf
                         <div class="col-lg-12">
                             <div class="panel panel-default">
                                 <div class="panel-heading">
@@ -173,15 +175,15 @@
                                         <div class="col-lg-12">
                                                 <div class="form-group">
                                                     <label>Name</label>
-                                                    <input name="name" class="form-control">
+                                                    <input name="name" value="{{ old('name') }}" class="form-control">
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Email</label>
-                                                    <input name="email" class="form-control">
+                                                    <input name="email" value="{{ old('email') }}"  class="form-control">
                                                 </div>
                                                 <div class="form-group">
                                                     <label>Phone</label>
-                                                    <input name="phone" class="form-control">
+                                                    <input name="phone" value="{{ old('phone') }}"  class="form-control">
                                                 </div>
                                         </div>
                                     </div>
@@ -200,36 +202,57 @@
                                 <div class="panel-body">
                                     <div class="row">
                                         <div class="col-lg-12">
-                                            <form role="form">
-                                                <div class="form-group">
-                                                    <label>Category</label>
-                                                    <select class="form-control">
-                                                        <option>Food</option>
-                                                        <option>Health</option>
-                                                        <option>Culture</option>
-                                                        <option>Entertainment</option>
-                                                        <option>Others</option>
+                                            {{-- <form role="form"> --}}
+                                                <div class="form-groupcol-lg-offset-2 col-lg-8 col-lg-offset-2">
+                                                    {{-- <label>Department</label> --}}
+                                                    <select class="form-control" name="department_id">
+                                                        <option value="">-- Select Department --</option>
+                                                        @foreach ($departments as $department)
+                                                            <option value="{{ $department->id }}" @if (old('department_id') == $department->id) selected @endif>{{ $department->name }}</option>
+                                                        @endforeach
                                                     </select>
                                                 </div>
-                                                <div class="form-group">
-                                                    <label>Score 1</label>
-                                                    <input name="score1" type="number" class="form-control">
+                                                <br>
+                                                <br>
+                                                <div style="padding:0px 150px 0px 150px">
+                                                    <hr>
                                                 </div>
-                                                <div class="form-group">
-                                                    <label>Score 2</label>
-                                                    <input name="score2" type="number" class="form-control">
+                                                <div class="col-md-6">
+                                                    @php $fields = ['punctuality', 'professionalism', 'innovation', 'respect', 'communication',]@endphp
+                                                    @foreach ($fields as $field)
+                                                        
+                                                        <div class="form-group">
+                                                            <label>{{ ucfirst($field) }}</label>
+                                                            <select class="form-control" name="{{ $field }}" required>
+                                                                <option value="">Select Score</option>
+                                                                @for ($i = 1; $i < 6; $i++)
+                                                                    <option vlaue="{{ $i }}" @if (old($field) == $i) selected @endif>{{ $i }}</option>
+                                                                @endfor
+                                                            </select>
+                                                        </div>
+                                                    @endforeach
                                                 </div>
-                                                <div class="form-group">
-                                                    <label>Score 3</label>
-                                                    <input name="score4" type="number" class="form-control">
-                                                </div>
-                                                <div class="form-group">
-                                                    <label>Score 4</label>
-                                                    <input name="score2" type="number" class="form-control">
+
+                                                <div class="col-md-6">
+                                                    @php $fields = ['management', 'leadership', 'delivery', 'inclusiveness', 'appearance',]@endphp
+                                                    @foreach ($fields as $field)
+                                                        
+                                                        <div class="form-group">
+                                                            <label>{{ ucfirst($field) }}</label>
+                                                            <select class="form-control" name="{{ $field }}" required>
+                                                                <option value="">Select Score</option>
+                                                                @for ($i = 1; $i < 6; $i++)
+                                                                    <option vlaue="{{ $i }}">{{ $i }}</option>
+                                                                @endfor
+                                                            </select>
+                                                        </div>
+                                                    @endforeach
                                                 </div>
                                                 
-                                                <button type="submit" class="btn btn-primary">Submit Button</button>
-                                                <button type="reset" class="btn btn-default">Reset Button</button>
+                                                <div class="col-md-12">
+                                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                                    <button type="reset" class="btn btn-default">Reset</button>
+                                                </div>
                                             </form>
                                         </div>
                                     </div>

@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Entry;
+use App\Models\Department;
+use App\Models\User;
 use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\DB;
 
 class EntryController extends Controller
 {
@@ -12,9 +16,19 @@ class EntryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        // return $request->filled('department');
+        $entries = [];
+        if ($request->filled('department')) {
+            $department = Department::where('name', $request->department)->first();
+            if (!$department) {
+                return redirect()->route('entries.index')->with('error', 'Department Not Found.');
+            }
+            $entries =  Entry::where('department_id', $department->id)->with('user')->orderBy('created_at', 'desc')->get();
+        }
+        $departments = Department::orderBy('created_at', 'desc')->get();
+        return view('entries', compact('entries', 'departments') );
     }
 
     /**
@@ -24,7 +38,8 @@ class EntryController extends Controller
      */
     public function create()
     {
-        //
+        $departments = Department::orderBy('created_at', 'desc')->get();
+        return view('create', compact('departments'));
     }
 
     /**
@@ -35,7 +50,40 @@ class EntryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|unique:users',
+            'phone' => 'required|numeric',
+            'department_id' => 'required',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            $data = $request->all();
+
+            // check if this user is already registered
+            $user = User::where('email', $data['email'])->first();
+            if ($user) {
+                // check if this user has an entry in the selected department
+                if (Entry::where('department_id', $data['department_id'])) 
+                    return redirect()->back()->with('error', 'This user entry has already been captured of the selected department')->withInput();
+            } else {
+                $data['password'] = bcrypt('password'); // create password for user
+                $user = User::create($data); // create user
+            }
+            
+            $data['user_id'] = $user->id; // add user id to the collection
+            Entry::create($data); //
+            DB::commit();
+
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return redirect()->back()->with('error', $th->getMessage())->withInput();
+
+        }
+        
+        return redirect()->back()->with('success', 'Entry Created Successfully');
+        // return $request->all();
     }
 
     /**

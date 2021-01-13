@@ -15,7 +15,8 @@ class CreateEntriesTable extends Migration
     {
         Schema::create('entries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('department_id')->constrained()->onDelete('cascade');
             $table->unsignedInteger('punctuality');
             $table->unsignedInteger('professionalism');
             $table->unsignedInteger('innovation');
@@ -26,9 +27,9 @@ class CreateEntriesTable extends Migration
             $table->unsignedInteger('delivery');
             $table->unsignedInteger('inclusiveness');
             $table->unsignedInteger('appearance');
-            $table->unsignedInteger('total');
-            $table->unsignedInteger('average');
-            $table->unsignedInteger('grade');
+            $table->unsignedInteger('total')->storedAs('punctuality + professionalism + innovation + respect + communication + management + leadership + delivery + inclusiveness + appearance');
+            $table->unsignedInteger('average')->nullable();
+            $table->unsignedInteger('grade')->nullable();
             $table->timestamps();
         });
     }
