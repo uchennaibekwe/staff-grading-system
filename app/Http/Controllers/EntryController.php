@@ -60,6 +60,12 @@ class EntryController extends Controller
         try {
             DB::beginTransaction();
             $data = $request->all();
+            $total = 0;
+            $fields = ['punctuality', 'professionalism', 'innovation', 'respect', 'communication', 'management', 'leadership', 'delivery', 'inclusiveness', 'appearance'];
+            foreach ($fields as $field) {
+                $total+= $request->$field;
+            }
+            $data['total'] = $total;
 
             // check if this user is already registered
             $user = User::where('email', $data['email'])->first();
