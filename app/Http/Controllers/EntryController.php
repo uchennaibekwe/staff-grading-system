@@ -52,7 +52,7 @@ class EntryController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'email' => 'required|unique:users',
+            'email' => 'required',
             'phone' => 'required|numeric',
             'department_id' => 'required',
         ]);
@@ -65,8 +65,8 @@ class EntryController extends Controller
             $user = User::where('email', $data['email'])->first();
             if ($user) {
                 // check if this user has an entry in the selected department
-                if (Entry::where('department_id', $data['department_id'])) 
-                    return redirect()->back()->with('error', 'This user entry has already been captured of the selected department')->withInput();
+                if (Entry::where('department_id', $data['department_id'])->where('user_id', $user->id)->first())
+                    return redirect()->back()->with('error', 'This user [email] entry has already been captured for the selected department')->withInput();
             } else {
                 $data['password'] = bcrypt('password'); // create password for user
                 $user = User::create($data); // create user

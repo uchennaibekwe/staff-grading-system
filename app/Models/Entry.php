@@ -35,11 +35,11 @@ class Entry extends Model
     }
 
     public function getAverageAttribute() {
-        return $this->total / 50;
+        return $this->total / 10;
     }
 
     public function getPercentageAttribute() {
-        return $this->attributes['percentage'] = $this->average * 100;
+        return $this->attributes['percentage'] = ($this->total / 50 ) * 100;
     }
 
     public function getGradeAttribute() {
