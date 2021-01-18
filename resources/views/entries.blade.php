@@ -3,7 +3,7 @@
 @section('content')
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Entry Summary</h1>
+            <h1 class="page-header">Staff Appraisal Summary</h1>
         </div>
         <!-- /.col-lg-12 -->
     </div>
@@ -12,7 +12,7 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading text-center">
-                    Search Entries by Department
+                    Search Appraisal Entries by Department
                 </div>
                 <!-- /.panel-heading -->
                 <form action="{{ route('entries.index') }}" method="get" class="form-inline">

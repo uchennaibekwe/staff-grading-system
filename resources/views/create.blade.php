@@ -3,7 +3,7 @@
 @section('content')
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Add Entry</h1>
+            <h1 class="page-header">Staff Appraisal Window</h1>
         </div>
     </div>
     @include("notification")
@@ -14,7 +14,7 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    User Information
+                    Staff Information
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -31,6 +31,15 @@
                                     <label>Phone</label>
                                     <input name="phone" value="{{ old('phone') }}"  class="form-control" type="number">
                                 </div>
+                                <div class="form-group">
+                                    {{-- <label>Department</label> --}}
+                                    <select class="form-control" name="department_id">
+                                        <option value="">-- Select Department --</option>
+                                        @foreach ($departments as $department)
+                                            <option value="{{ $department->id }}" @if (old('department_id') == $department->id) selected @endif>{{ $department->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                         </div>
                     </div>
                     <!-- /.row (nested) -->
@@ -43,26 +52,12 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Entry Information
+                    Staff Appraisal Score sheet
                 </div>
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-lg-12">
                             {{-- <form role="form"> --}}
-                                <div class="form-groupcol-lg-offset-2 col-lg-8 col-lg-offset-2">
-                                    {{-- <label>Department</label> --}}
-                                    <select class="form-control" name="department_id">
-                                        <option value="">-- Select Department --</option>
-                                        @foreach ($departments as $department)
-                                            <option value="{{ $department->id }}" @if (old('department_id') == $department->id) selected @endif>{{ $department->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <br>
-                                <br>
-                                <div style="padding:0px 150px 0px 150px">
-                                    <hr>
-                                </div>
                                 <div class="col-md-6">
                                     @php $fields = ['punctuality', 'professionalism', 'innovation', 'respect', 'communication',]@endphp
                                     @foreach ($fields as $field)

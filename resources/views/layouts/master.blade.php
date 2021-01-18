@@ -50,10 +50,10 @@
                             <i class="fa fa-pencil fa-fw"></i> Entries <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu dropdown-user">
-                            <li><a href="{{ route('entries.index') }}"><i class="fa fa-eye fa-fw"></i>View Entries</a>
+                            <li><a href="{{ route('entries.index') }}"><i class="fa fa-eye fa-fw"></i>View Appraisal Entries</a>
                             </li>
                             <li class="divider"></li>
-                            <li><a href="{{ route('entries.create') }}"><i class="fa fa-plus fa-fw"></i> Add Entries</a>
+                            <li><a href="{{ route('entries.create') }}"><i class="fa fa-plus fa-fw"></i> Add Appraisal Entry</a>
                             </li>
                             {{-- <li class="divider"></li> --}}
                             {{-- <li><a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
@@ -103,7 +103,7 @@
             <!-- /#page-wrapper -->
         </div>
         <!-- /#wrapper -->
-        
+
         <!-- jQuery -->
         <script src="../js/jquery.min.js"></script>
 
