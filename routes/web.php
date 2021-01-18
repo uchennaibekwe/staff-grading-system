@@ -17,7 +17,7 @@ use App\Http\Controllers\EntryController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->to('/entries');
 });
 
 Route::resource('departments', departmentController::class);
