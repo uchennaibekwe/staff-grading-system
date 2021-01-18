@@ -21,7 +21,8 @@ class Entry extends Model
         'leadership',
         'delivery',
         'inclusiveness',
-        'appearance'
+        'appearance',
+        'total'
     ];
 
     public $appends = ['percentage'];

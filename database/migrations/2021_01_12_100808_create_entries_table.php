@@ -27,7 +27,7 @@ class CreateEntriesTable extends Migration
             $table->unsignedInteger('delivery');
             $table->unsignedInteger('inclusiveness');
             $table->unsignedInteger('appearance');
-            $table->unsignedInteger('total')->storedAs('punctuality + professionalism + innovation + respect + communication + management + leadership + delivery + inclusiveness + appearance');
+            $table->unsignedInteger('total')->nullable();
             $table->unsignedInteger('average')->nullable();
             $table->unsignedInteger('grade')->nullable();
             $table->timestamps();
