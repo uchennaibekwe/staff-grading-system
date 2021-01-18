@@ -52,7 +52,7 @@
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Staff Appraisal Score sheet
+                    Staff Appraisal Score Sheet
                 </div>
                 <div class="panel-body">
                     <div class="row">
