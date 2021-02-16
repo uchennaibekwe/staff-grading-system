@@ -7,6 +7,13 @@ use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->back()->with('error', 'You\'re trespassing!');
+        }
+    }
     /**
      * Display a listing of the resource.
      *

@@ -23,3 +23,7 @@ Route::get('/', function () {
 Route::resource('departments', departmentController::class);
 Route::resource('entries', EntryController::class);
 
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

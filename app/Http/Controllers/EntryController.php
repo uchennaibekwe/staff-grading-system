@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 class EntryController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +22,11 @@ class EntryController extends Controller
      */
     public function index(Request $request)
     {
-        // return $request->filled('department');
+        // only admins can see entries 
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->route('entries.create');
+        }
+
         $entries = [];
         if ($request->filled('department')) {
             $department = Department::where('name', $request->department)->first();
@@ -36,10 +44,29 @@ class EntryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
+        // only users
+        if (auth()->user()->isAdmin()) {
+            return redirect()->back()->with('error', 'Only users can create appraisal entries!');
+        }
+
+        $entry = [];
+        if ($request->filled('department')) {
+            $department = Department::where('name', $request->department)->first();
+            if (!$department) {
+                return redirect()->route('entries.create');
+            }
+            $entry =  Entry::where('department_id', $department->id)->where('user_id', auth()->user()->id)->first();
+        } else {
+            if ($department = Department::latest('updated_at')->first()) {
+                $entry =  Entry::where('department_id', $department->id)->where('user_id', auth()->user()->id)->first();
+                return redirect()->to('/entries/create?department=' . strtolower($department->name));
+            }
+        }
+
         $departments = Department::orderBy('created_at', 'desc')->get();
-        return view('create', compact('departments'));
+        return view('create', compact('departments', 'entry'));
     }
 
     /**
@@ -56,8 +83,13 @@ class EntryController extends Controller
             'phone' => 'required|numeric',
             'department_id' => 'required',
         ]);
-
+        
         try {
+            // only users
+            if (auth()->user()->isAdmin()) {
+                return redirect()->back()->with('error', 'Only users can create appraisal entries!');
+            }
+            
             DB::beginTransaction();
             $data = $request->all();
             $total = 0;
@@ -68,18 +100,24 @@ class EntryController extends Controller
             $data['total'] = $total;
 
             // check if this user is already registered
-            $user = User::where('email', $data['email'])->first();
-            if ($user) {
-                // check if this user has an entry in the selected department
-                if (Entry::where('department_id', $data['department_id'])->where('user_id', $user->id)->first())
-                    return redirect()->back()->with('error', 'This user [email] entry has already been captured for the selected department')->withInput();
-            } else {
-                $data['password'] = bcrypt('password'); // create password for user
-                $user = User::create($data); // create user
-            }
+            // $user = User::where('email', $data['email'])->first();
+            // if ($user) {
+            //     // check if this user has an entry in the selected department
+            //     if (Entry::where('department_id', $data['department_id'])->where('user_id', $user->id)->first())
+            //         return redirect()->back()->with('error', 'This user [email] entry has already been captured for the selected department')->withInput();
+            // } else {
+            //     $data['password'] = bcrypt('password'); // create password for user
+            //     $user = User::create($data); // create user
+            // }
             
-            $data['user_id'] = $user->id; // add user id to the collection
-            Entry::create($data); //
+            // check if entry has already been created or not
+            // $check = Entry
+            $data['user_id'] = auth()->user()->id; // add user id to the collection
+            // Entry::create($data); //
+            Entry::updateOrCreate(
+                ['user_id' => auth()->user()->id, 'department_id' => $data['department_id']],
+                $data
+            );
             DB::commit();
 
         } catch (\Throwable $th) {

@@ -21,22 +21,22 @@
                         <div class="col-lg-12">
                                 <div class="form-group">
                                     <label>Name</label>
-                                    <input name="name" value="{{ old('name') }}" class="form-control">
+                                    <input name="name" value="{{ auth()->user()->name}}" class="form-control" readonly>
                                 </div>
                                 <div class="form-group">
                                     <label>Email</label>
-                                    <input name="email" value="{{ old('email') }}"  class="form-control">
+                                    <input name="email" value="{{ auth()->user()->email }}"  class="form-control" readonly>
                                 </div>
                                 <div class="form-group">
                                     <label>Phone</label>
-                                    <input name="phone" value="{{ old('phone') }}"  class="form-control" type="number">
+                                    <input name="phone" value="{{ auth()->user()->phone }}"  class="form-control" type="number" readonly>
                                 </div>
                                 <div class="form-group">
-                                    {{-- <label>Department</label> --}}
-                                    <select class="form-control" name="department_id">
+                                    <label>Department</label>
+                                    <select class="form-control" name="department_id" onchange="loadDepartmentEntry(this)">
                                         <option value="">-- Select Department --</option>
                                         @foreach ($departments as $department)
-                                            <option value="{{ $department->id }}" @if (old('department_id') == $department->id) selected @endif>{{ $department->name }}</option>
+                                            <option value="{{ $department->id }}" @if (strtolower(Request::get('department')) == strtolower($department->name) || old('department_id') == $department->id) selected @endif>{{ $department->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -67,7 +67,7 @@
                                             <select class="form-control" name="{{ $field }}" required>
                                                 <option value="">Select Score</option>
                                                 @for ($i = 1; $i < 6; $i++)
-                                                    <option vlaue="{{ $i }}" @if (old($field) == $i) selected @endif>{{ $i }}</option>
+                                                    <option value="{{ $i }}" @if (!empty($entry) && $entry->$field == $i) selected @endif>{{ $i }}</option>
                                                 @endfor
                                             </select>
                                         </div>
@@ -83,7 +83,7 @@
                                             <select class="form-control" name="{{ $field }}" required>
                                                 <option value="">Select Score</option>
                                                 @for ($i = 1; $i < 6; $i++)
-                                                    <option vlaue="{{ $i }}" @if (old($field) == $i) selected @endif>{{ $i }}</option>
+                                                <option value="{{ $i }}" @if (!empty($entry) && $entry->$field == $i) selected @endif>{{ $i }}</option>
                                                 @endfor
                                             </select>
                                         </div>
@@ -91,7 +91,7 @@
                                 </div>
                                 
                                 <div class="col-md-12">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    <button type="submit" class="btn btn-primary"> @if(!empty($entry)) Update @else Submit @endif </button>
                                     <button type="reset" class="btn btn-default">Reset</button>
                                 </div>
                             </form>
@@ -105,4 +105,15 @@
         </div>
         <!-- /.col-lg-12 -->
     </div>
+@endsection
+
+@section('js')
+    <script>
+        function loadDepartmentEntry(e) {
+            if (e.value == '') return false;
+            var department = e.options[e.selectedIndex].text.toLowerCase();
+            
+            window.location.replace(`create?department=${department}`);
+        }
+    </script>
 @endsection

@@ -7,7 +7,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>Startmin - Bootstrap Admin Theme</title>
+        <title>Staff Grading System</title>
 
         <!-- Bootstrap Core CSS -->
         <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
@@ -31,7 +31,7 @@
     <body>
         <div id="wrapper">
             <!-- Navigation -->
-            <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <nav class="container-fluid navbar navbar-inverse navbar-fixed-top" role="navigation">
                 <div class="navbar-header">
                     <a class="navbar-brand" href="index.html">Staff Grading</a>
                 </div>
@@ -42,25 +42,66 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button> --}}
-
                 <ul class="nav navbar navbar-top-links">
-                    <li><a href="{{ route('departments.index') }}"><i class="fa fa-home fa-fw"></i> Departments </a></li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="fa fa-pencil fa-fw"></i> Entries <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="{{ route('entries.index') }}"><i class="fa fa-eye fa-fw"></i>View Appraisal Entries</a>
+                    @guest
+                        @if (Route::has('login'))
+                            <li class="pull-right">
+                                <a href="{{ route('login') }}">{{ __('Login') }}</a>
                             </li>
-                            <li class="divider"></li>
-                            <li><a href="{{ route('entries.create') }}"><i class="fa fa-plus fa-fw"></i> Add Appraisal Entry</a>
+                        @endif
+                        
+                        @if (Route::has('register'))
+                            <li class="pull-right">
+                                <a href="{{ route('register') }}">{{ __('Register') }}</a>
                             </li>
-                            {{-- <li class="divider"></li> --}}
-                            {{-- <li><a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
-                            </li> --}}
-                        </ul>
-                    </li>
-                </ul>
+                        @endif
+                    @else
+                        @if(auth()->user()->isAdmin())
+                            <li><a href="{{ route('departments.index') }}"><i class="fa fa-home fa-fw"></i> Departments </a></li>
+                        @endif
+
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-pencil fa-fw"></i> Entries <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                @if(auth()->user()->isAdmin())
+                                    <li><a href="{{ route('entries.index') }}"><i class="fa fa-eye fa-fw"></i>View Appraisal Entries</a>
+                                    </li>
+                                @else
+                                    <li class="divider"></li>
+                                    <li><a href="{{ route('entries.create') }}"><i class="fa fa-plus fa-fw"></i> Add/Edit Appraisal Entry</a>
+                                    </li>
+                                @endif
+                                {{-- <li class="divider"></li> --}}
+                                {{-- <li><a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                                </li> --}}
+                            </ul>
+                        </li>
+                        
+                        <li class="dropdown pull-right">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-user"></i><b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#">{{ auth()->user()->name }} </a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                        onclick="event.preventDefault();
+                                                        document.getElementById('logout-form').submit();">
+                                        {{ __('Logout') }}
+                                    </a>
+        
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                        @csrf
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                        @endguest
+                    </ul>
                 <!-- /.navbar-top-links -->
 
                 {{-- <div class="navbar-default sidebar" role="navigation">
@@ -127,5 +168,7 @@
                 });
             });
         </script>
+
+        @yield('js')
     </body>
 </html>
