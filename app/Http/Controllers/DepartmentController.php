@@ -10,9 +10,6 @@ class DepartmentController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        if (!auth()->user()->isAdmin()) {
-            return redirect()->back()->with('error', 'You\'re trespassing!');
-        }
     }
     /**
      * Display a listing of the resource.
@@ -21,6 +18,9 @@ class DepartmentController extends Controller
      */
     public function index()
     {
+        if (!auth()->user()->isAdmin()) {
+            return redirect()->back()->with('error', 'You\'re trespassing!');
+        }
         $departments = Department::orderBy('created_at', 'desc')->get();
         return view('departments', compact('departments'));
     }
@@ -48,6 +48,9 @@ class DepartmentController extends Controller
         ]);
 
         try {
+            if (!auth()->user()->isAdmin()) {
+                return redirect()->back()->with('error', 'You\'re trespassing!');
+            }
             Department::create($request->all());
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
@@ -99,6 +102,9 @@ class DepartmentController extends Controller
     public function destroy(Department $department)
     {
         try {
+            if (!auth()->user()->isAdmin()) {
+                return redirect()->back()->with('error', 'You\'re trespassing!');
+            }
             $department->delete();
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
