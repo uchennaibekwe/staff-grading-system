@@ -33,7 +33,7 @@ class EntryController extends Controller
             if (!$department) {
                 return redirect()->route('entries.index')->with('error', 'Department Not Found.');
             }
-            $entries =  Entry::where('department_id', $department->id)->with('user')->orderBy('created_at', 'desc')->get();
+            $entries =  Entry::where('department_id', $department->id)->with('user')->orderBy('updated_at', 'desc')->get();
         }
         $departments = Department::orderBy('created_at', 'desc')->get();
         return view('entries', compact('entries', 'departments') );
@@ -46,9 +46,16 @@ class EntryController extends Controller
      */
     public function create(Request $request)
     {
-        // only users
+        
+        $user = auth()->user();
         if (auth()->user()->isAdmin()) {
-            return redirect()->back()->with('error', 'Only users can create appraisal entries!');
+            // to edit a particular user's entry
+            if (!$request->filled('user')) {
+                // the user parameter wasn't sent
+                return redirect()->back()->with('error', 'Only users can create appraisal entries!');
+            }
+            // else
+            $user = User::find($request->user);
         }
 
         $entry = [];
@@ -57,16 +64,16 @@ class EntryController extends Controller
             if (!$department) {
                 return redirect()->route('entries.create');
             }
-            $entry =  Entry::where('department_id', $department->id)->where('user_id', auth()->user()->id)->first();
+            $entry =  Entry::where('department_id', $department->id)->where('user_id', $user->id)->first();
         } else {
             if ($department = Department::latest('updated_at')->first()) {
-                $entry =  Entry::where('department_id', $department->id)->where('user_id', auth()->user()->id)->first();
+                $entry =  Entry::where('department_id', $department->id)->where('user_id', $user->id)->first();
                 return redirect()->to('/entries/create?department=' . strtolower($department->name));
             }
         }
 
         $departments = Department::orderBy('created_at', 'desc')->get();
-        return view('create', compact('departments', 'entry'));
+        return view('create', compact('departments', 'entry', 'user'));
     }
 
     /**
@@ -78,100 +85,61 @@ class EntryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required',
-            'phone' => 'required|numeric',
+            'user_id' => 'required|numeric',
             'department_id' => 'required',
         ]);
         
         try {
-            // only users
-            if (auth()->user()->isAdmin()) {
-                return redirect()->back()->with('error', 'Only users can create appraisal entries!');
-            }
             
-            DB::beginTransaction();
-            $data = $request->all();
+            $data = $request->except(['comment', 'closed']);
+
+            if (auth()->user()->isAdmin()) {
+                // only admin can comment and close an appraisal
+                $data['comment'] = $request->comment;
+                if ($request->filled('closed')) 
+                    $data['closed'] = true;
+                else 
+                    $data['closed'] = false;
+                // return redirect()->back()->with('error', 'Only users can create appraisal entries!');
+            }
+
             $total = 0;
             $fields = ['punctuality', 'professionalism', 'innovation', 'respect', 'communication', 'management', 'leadership', 'delivery', 'inclusiveness', 'appearance'];
             foreach ($fields as $field) {
-                $total+= $request->$field;
+                $total += $request->$field;
             }
-            $data['total'] = $total;
 
-            // check if this user is already registered
-            // $user = User::where('email', $data['email'])->first();
-            // if ($user) {
-            //     // check if this user has an entry in the selected department
-            //     if (Entry::where('department_id', $data['department_id'])->where('user_id', $user->id)->first())
-            //         return redirect()->back()->with('error', 'This user [email] entry has already been captured for the selected department')->withInput();
-            // } else {
-            //     $data['password'] = bcrypt('password'); // create password for user
-            //     $user = User::create($data); // create user
-            // }
-            
+            $data['total'] = $total;
+ 
             // check if entry has already been created or not
             // $check = Entry
-            $data['user_id'] = auth()->user()->id; // add user id to the collection
+            $data['user_id'] = $request->user_id; // add user id to the collection
             // Entry::create($data); //
             Entry::updateOrCreate(
-                ['user_id' => auth()->user()->id, 'department_id' => $data['department_id']],
+                ['user_id' => $request->user_id, 'department_id' => $data['department_id']],
                 $data
             );
-            DB::commit();
 
         } catch (\Throwable $th) {
-            DB::rollback();
             return redirect()->back()->with('error', $th->getMessage())->withInput();
-
         }
         
         return redirect()->back()->with('success', 'Entry Created Successfully');
         // return $request->all();
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Entry  $entry
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Entry $entry)
-    {
-        //
-    }
+    public function markAsClosed(Request $request) {
+        $request->validate([
+            'id' => 'required|numeric',
+            'comment' => 'required',
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Entry  $entry
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Entry $entry)
-    {
-        //
-    }
+        $entry = Entry::find($request->id);
+        $entry->comment = $request->comment;
+        $entry->closed = true;
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Entry  $entry
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Entry $entry)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Entry  $entry
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Entry $entry)
-    {
-        //
+        if ($entry->save()) {
+            return redirect()->back()->with('success', 'Entry marked as completed!');
+        }
     }
 }

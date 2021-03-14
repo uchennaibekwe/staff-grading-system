@@ -22,7 +22,9 @@ class Entry extends Model
         'delivery',
         'inclusiveness',
         'appearance',
-        'total'
+        'total',
+        'comment',
+        'closed'
     ];
 
     public $appends = ['percentage'];
@@ -53,7 +55,7 @@ class Entry extends Model
         else if ($average >= 65)
             return 'B';
         else if ($average >= 55)
-            return 'c';
+            return 'C';
         else if ($average >= 40)
             return 'D';
         else if ($average >= 30)

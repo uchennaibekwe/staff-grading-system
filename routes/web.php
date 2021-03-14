@@ -23,6 +23,7 @@ Route::get('/', function () {
 Route::resource('departments', departmentController::class);
 Route::resource('entries', EntryController::class);
 
+Route::post('closeentry', [EntryController::class, 'markAsClosed'])->name('entries.closed');
 
 Auth::routes();
 

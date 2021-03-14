@@ -46,7 +46,7 @@
             else if ($average >= 65)
                 return 'B';
             else if ($average >= 55)
-                return 'c';
+                return 'C';
             else if ($average >= 40)
                 return 'D';
             else if ($average >= 30)
@@ -164,7 +164,9 @@
                         <table class="table table-striped table-bordered table-hover" id="dataTables-example">
                             <thead>
                                 <tr>
+                                    <th>Actions</th>
                                     <th>User</th>
+                                    <th>Status</th>
                                         @foreach ($fields as $field)
                                             <th>{{ ucfirst($field) }}</th>
                                         @endforeach
@@ -177,46 +179,23 @@
                             <tbody>
                                 @foreach ($entries as $entry)
                                     <tr class="gradeA">
+                                        <td>
+                                            <a href="{{ route('entries.create', ['user' => $entry->user, 'department' => Request::get('department')]) }}">
+                                                <i class="btn btn-primary fa fa-pencil"></i>
+                                            </a>
+                                            <i class="btn btn-success fa fa-check" data-toggle="modal" data-target="#modalId" onclick="markAsClose({{ $entry }})"></i>
+                                        </td>
                                         <td>{{ $entry->user->name }}</td>
+                                        <td class="{{ $entry->closed ? 'bg-success' : 'bg-danger'}}">{{ $entry->closed ? 'done' : 'ongoing' }}</td>
                                         @foreach ($fields as $field)
                                             <td class="center">{{ $entry->$field }}</td>
                                         @endforeach
-                                        {{-- <td class="center">{{ $entry->punctuality }}</td>
-                                        <td class="center">1.5</td>
-                                        <td class="center">4.5</td> --}}
                                         <td class="center">{{ $entry->total}}</td>
                                         <td class="center">{{ $entry->average}}</td>
                                         <td class="center">{{ $entry->percentage}}%</td>
                                         <td class="center">{{ $entry->grade }}</td>
                                     </tr>
                                 @endforeach
-                                {{-- <tr class="gradeA">
-                                    <td>Obinna</td>
-                                    <td class="center">1.5</td>
-                                    <td class="center">1.5</td>
-                                    <td class="center">1.5</td>
-                                    <td class="center">4.5</td>
-                                    <td class="center">12%</td>
-                                    <td class="center">A</td>
-                                </tr>
-                                <tr class="gradeA">
-                                    <td>Chinedu</td>
-                                    <td class="center">1.5</td>
-                                    <td class="center">1.5</td>
-                                    <td class="center">1.5</td>
-                                    <td class="center">4.5</td>
-                                    <td class="center">12%</td>
-                                    <td class="center">A</td>
-                                </tr>
-                                <tr class="gradeA">
-                                    <td>Chika</td>
-                                    <td class="center">1.5</td>
-                                    <td class="center">1.5</td>
-                                    <td class="center">1.5</td>
-                                    <td class="center">4.5</td>
-                                    <td class="center">12%</td>
-                                    <td class="center">A</td>
-                                </tr> --}}
                             </tbody>
                         </table>
                     </div>
@@ -227,5 +206,39 @@
         </div>
         <!-- /.col-lg-12 -->
     </div>
+
+    <div class="modal fade" id="modalId">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Comment [<i id="selectedUser"></i>]</h5>
+            </div>
+            <form action="{{ route('entries.closed') }}" method="post">
+            <div class="modal-body">
+                    @csrf
+                    <input type="hidden" name="id" id="selectedEntryId">
+                    <textarea name="comment" id="comment" placeholder="Enter comment" class="form-control" rows=""cols="30" rows="30"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      1
+      
     @endif
+@endsection
+
+@section('js')
+    <script>
+        function markAsClose(entry) {
+            console.log(entry);
+            document.getElementById('selectedEntryId').value = entry.id;
+            document.getElementById('selectedUser').innerHTML = entry.user.name;
+            document.getElementById('comment').innerHTML = entry.comment;
+        }
+    </script>
 @endsection

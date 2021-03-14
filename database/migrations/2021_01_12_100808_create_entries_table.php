@@ -28,8 +28,6 @@ class CreateEntriesTable extends Migration
             $table->unsignedInteger('inclusiveness');
             $table->unsignedInteger('appearance');
             $table->unsignedInteger('total')->nullable();
-            $table->unsignedInteger('average')->nullable();
-            $table->unsignedInteger('grade')->nullable();
             $table->timestamps();
         });
     }
